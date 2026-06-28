@@ -233,6 +233,26 @@ class Session:
                     )
                     state.mismatched_asn = True
                 logger.debug("Received repeat ASN mismatch response from MAM")
+            elif json_response_msg == "Invalid session - Other".casefold():
+                if not state.mismatched_asn:
+                    logger.error("Could not update session IP: Received 'Invalid session - Other' from MAM")
+                    logger.error(
+                        "This can happen if your VPN provider ASN is not authorized, or the session cookie is invalid/expired."
+                    )
+                    logger.error("Please verify your MAM_ID is correct and your ASN is authorized in MAM 'Security' tab.")
+                    logger.error(f"Current IP: {state.ip}")
+                    logger.error(f"Current ASN: {state.asn}")
+                    logger.info(
+                        "Checking for updated ASN permissions"
+                        " with MAM every 5 minutes"
+                    )
+                    notify(
+                        "invalid session - other",
+                        "Current mam_id was rejected by MAM."
+                        " The session is not authorized to use the current ASN, or the cookie is invalid.",
+                    )
+                    state.mismatched_asn = True
+                logger.debug("Received repeat 'Invalid session - Other' response from MAM")
             elif json_response_msg == "Invalid session - Invalid Cookie".casefold():
                 close_script("Session invalid due to incorrectly formatted mam_id", 1)
             elif json_response_msg == "Incorrect session type - Other".casefold():
