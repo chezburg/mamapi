@@ -159,6 +159,7 @@ class Session:
         return
 
     def _processResponse(self, jsonResponse: requests.Response) -> None:
+        logger.info(f"Raw API Response [Status: {jsonResponse.status_code}]: {jsonResponse.text}")
         json_response_msg = ""
         global state
         try:
